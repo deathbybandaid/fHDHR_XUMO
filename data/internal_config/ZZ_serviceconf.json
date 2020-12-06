@@ -1,0 +1,80 @@
+{
+  "main":{
+          "servicename":{
+                "value": "XUMO",
+                "config_file": false,
+                "config_web": false
+                },
+          "dictpopname":{
+                      "value": "xumo",
+                      "config_file": false,
+                      "config_web": false
+                    },
+          "reponame":{
+                          "value": "fHDHR_XUMO",
+                          "config_file": false,
+                          "config_web": false
+                        },
+          "valid_epg_methods":{
+                          "value": "None,blocks,origin",
+                          "config_file": false,
+                          "config_web": false
+                        },
+          "required":{
+                          "value": "none",
+                          "config_file": false,
+                          "config_web": false
+                        }
+  },
+  "fhdhr":{
+          "friendlyname":{
+                    "value": "fHDHR-XUMO",
+                    "config_file": true,
+                    "config_web": true
+                },
+          "stream_type":{
+                              "value": "direct",
+                              "config_file": true,
+                              "config_web": true
+                              },
+          "tuner_count":{
+                  "value": 4,
+                  "config_file": true,
+                  "config_web": true
+                },
+          "reporting_firmware_name":{
+                                    "value": "fHDHR_XUMO",
+                                    "config_file": true,
+                                    "config_web": true
+                                  }
+  },
+  "epg":{
+          "method":{
+                    "value": "blocks",
+                    "config_file": true,
+                    "config_web": true
+                },
+          "update_frequency":{
+                    "value": 14400,
+                    "config_file": true,
+                    "config_web": true
+                }
+  },
+  "xumo":{
+          "force_best":{
+                    "value": false,
+                    "config_file": true,
+                    "config_web": true
+                },
+          "geoID":{
+                    "value": "none",
+                    "config_file": true,
+                    "config_web": false
+                },
+          "geoLST":{
+                    "value": "none",
+                    "config_file": true,
+                    "config_web": false
+                }
+  }
+}
