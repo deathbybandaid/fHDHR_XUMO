@@ -15,50 +15,45 @@ class OriginEPG():
         self.remove_stale_cache(todaydate)
 
         for fhdhr_id in list(fhdhr_channels.list.keys()):
-            c = fhdhr_channels.list[fhdhr_id].dict
+            chan_obj = fhdhr_channels.list[fhdhr_id]
 
-            if str(c["number"]) not in list(programguide.keys()):
-                programguide[str(c["number"])] = {
-                                                    "callsign": c["callsign"],
-                                                    "name": c["name"],
-                                                    "number": c["number"],
-                                                    "id": c["origin_id"],
-                                                    "thumbnail": c["thumbnail"],
-                                                    "listing": [],
-                                                    }
-                cached_items = self.get_cached(c["origin_id"])
-                for cached_item in cached_items:
+            if str(chan_obj.dict["number"]) not in list(programguide.keys()):
+                programguide[str(chan_obj.dict["number"])] = chan_obj.epgdict
 
-                    for asset in cached_item["assets"]:
+            cached_items = self.get_cached(chan_obj.dict["origin_id"])
+            for cached_item in cached_items:
 
-                        content_id = asset["id"]
-                        content_cache = self.get_cached_content(content_id)
+                for asset in cached_item["assets"]:
 
-                        timestart = self.xumo_xmltime(asset['timestamps']["start"])
-                        timeend = self.xumo_xmltime(asset['timestamps']["end"])
+                    content_id = asset["id"]
+                    content_cache = self.get_cached_content(content_id)
 
-                        if "descriptions" not in list(content_cache.keys()):
-                            content_cache["descriptions"] = {}
+                    timestart = self.xumo_xmltime(asset['timestamps']["start"])
+                    timeend = self.xumo_xmltime(asset['timestamps']["end"])
 
-                        clean_prog_dict = {
-                                        "time_start": timestart,
-                                        "time_end": timeend,
-                                        "duration_minutes": str((asset['timestamps']["end"] - asset['timestamps']["start"]) / 60),
-                                        "thumbnail": 'https://image.xumo.com/v1/assets/asset/%s/600x340.jpg' % content_id,
-                                        "title": content_cache['title'] or "Unavailable",
-                                        "sub-title": "Unavailable",
-                                        "description": self.getDescription(content_cache["descriptions"]) or "Unavailable",
-                                        "rating": "N/A",
-                                        "episodetitle": "Unavailable",
-                                        "releaseyear": None,
-                                        "genres": None,
-                                        "seasonnumber": None,
-                                        "episodenumber": None,
-                                        "isnew": None,
-                                        "id": str(content_id)
-                                        }
+                    if "descriptions" not in list(content_cache.keys()):
+                        content_cache["descriptions"] = {}
 
-                        programguide[str(c["number"])]["listing"].append(clean_prog_dict)
+                    clean_prog_dict = {
+                                    "time_start": timestart,
+                                    "time_end": timeend,
+                                    "duration_minutes": str((asset['timestamps']["end"] - asset['timestamps']["start"]) / 60),
+                                    "thumbnail": 'https://image.xumo.com/v1/assets/asset/%s/600x340.jpg' % content_id,
+                                    "title": content_cache['title'] or "Unavailable",
+                                    "sub-title": "Unavailable",
+                                    "description": self.getDescription(content_cache["descriptions"]) or "Unavailable",
+                                    "rating": "N/A",
+                                    "episodetitle": "Unavailable",
+                                    "releaseyear": None,
+                                    "genres": None,
+                                    "seasonnumber": None,
+                                    "episodenumber": None,
+                                    "isnew": None,
+                                    "id": str(content_id)
+                                    }
+
+                    if not any(d['id'] == clean_prog_dict['id'] for d in programguide[str(chan_obj.dict["number"])]["listing"]):
+                        programguide[str(chan_obj.dict["number"])]["listing"].append(clean_prog_dict)
 
         return programguide
 
