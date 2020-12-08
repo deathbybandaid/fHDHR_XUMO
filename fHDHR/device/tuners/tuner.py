@@ -49,6 +49,7 @@ class Tuner():
     def runscan(self):
         self.fhdhr.web.session.get(self.chanscan_url)
         self.fhdhr.logger.info("Requested Channel Scan Complete.")
+        self.close()
         self.fhdhr.web.session.get(self.close_url)
 
     def add_downloaded_size(self, bytes_count):
