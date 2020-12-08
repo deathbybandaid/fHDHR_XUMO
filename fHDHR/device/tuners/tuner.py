@@ -72,6 +72,7 @@ class Tuner():
 
     def get_status(self):
         current_status = self.status.copy()
+        current_status["locked"] = self.tuner_lock.locked()
         if current_status["status"] == "Active":
             current_status["Play Time"] = str(
                 humanized_time(
