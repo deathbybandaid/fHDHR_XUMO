@@ -67,6 +67,7 @@ class Tuner():
     def close(self):
         self.set_off_status()
         if self.tuner_lock.locked():
+            print("is locked, releasing")
             self.tuner_lock.release()
         self.fhdhr.logger.info("Tuner #" + str(self.number) + " Released.")
 
