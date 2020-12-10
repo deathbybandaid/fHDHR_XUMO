@@ -43,9 +43,3 @@ class OriginService():
             return None, None
 
         return geoID, geoLST
-
-    def get_status_dict(self):
-        ret_status_dict = {
-                            "Login": "Success",
-                            }
-        return ret_status_dict
