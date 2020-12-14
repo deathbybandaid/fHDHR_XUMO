@@ -28,8 +28,8 @@ class OriginEPG():
                     content_id = asset["id"]
                     content_cache = self.get_cached_content(content_id)
 
-                    timestart = self.xumo_xmltime(asset['timestamps']["start"])
-                    timeend = self.xumo_xmltime(asset['timestamps']["end"])
+                    timestart = int(asset['timestamps']["start"] / 1000)
+                    timeend = int(asset['timestamps']["end"] / 1000)
 
                     if "descriptions" not in list(content_cache.keys()):
                         content_cache["descriptions"] = {}
@@ -69,11 +69,6 @@ class OriginEPG():
         else:
             return None
 
-    def xumo_xmltime(self, tm):
-        tm = datetime.datetime.fromtimestamp(tm/1000.0)
-        tm = str(tm.strftime('%Y%m%d%H%M%S')) + " +0000"
-        return tm
-
     def get_cached_content(self, content_id):
         cacheitem = self.fhdhr.db.get_cacheitem_value(str(content_id), "content_cache", "origin")
         if cacheitem:
@@ -88,20 +83,20 @@ class OriginEPG():
                 self.fhdhr.logger.info('Got an error!  Ignoring it.')
                 return None
             result = resp.json()
-            self.fhdhr.db.set_cacheitem_value(str(content_id), "offline_cache", result, "origin")
+            self.fhdhr.db.set_cacheitem_value(str(content_id), "epg_cache", result, "origin")
             return result
 
     def get_cached(self, channel_id):
         for hour_num in range(0, 24):
             lineup_url = "%schannels/channel/%s/broadcast.json?hour=%s" % (self.base_api, channel_id, hour_num)
             self.get_cached_item(channel_id, hour_num, lineup_url)
-        cache_list = self.fhdhr.db.get_cacheitem_value("cache_list", "offline_cache", "origin") or []
-        return [self.fhdhr.db.get_cacheitem_value(x, "offline_cache", "origin") for x in cache_list if x.startswith(channel_id)]
+        cache_list = self.fhdhr.db.get_cacheitem_value("cache_list", "epg_cache", "origin") or []
+        return [self.fhdhr.db.get_cacheitem_value(x, "epg_cache", "origin") for x in cache_list if x.startswith(channel_id)]
 
     def get_cached_item(self, channel_id, cache_key, url):
         cache_key = datetime.datetime.today().replace(hour=cache_key).timestamp()
         cache_key = str(channel_id) + "_" + str(cache_key)
-        cacheitem = self.fhdhr.db.get_cacheitem_value(str(cache_key), "offline_cache", "origin")
+        cacheitem = self.fhdhr.db.get_cacheitem_value(str(cache_key), "epg_cache", "origin")
         if cacheitem:
             self.fhdhr.logger.info('FROM CACHE:  ' + str(cache_key))
             return cacheitem
@@ -114,27 +109,27 @@ class OriginEPG():
                 return
             result = resp.json()
 
-            self.fhdhr.db.set_cacheitem_value(str(cache_key), "offline_cache", result, "origin")
-            cache_list = self.fhdhr.db.get_cacheitem_value("cache_list", "offline_cache", "origin") or []
+            self.fhdhr.db.set_cacheitem_value(str(cache_key), "epg_cache", result, "origin")
+            cache_list = self.fhdhr.db.get_cacheitem_value("cache_list", "epg_cache", "origin") or []
             cache_list.append(str(cache_key))
-            self.fhdhr.db.set_cacheitem_value("cache_list", "offline_cache", cache_list, "origin")
+            self.fhdhr.db.set_cacheitem_value("cache_list", "epg_cache", cache_list, "origin")
 
     def remove_stale_cache(self, todaydate):
         cache_clear_time = todaydate.strftime('%Y-%m-%dT%H:00:00')
         cache_clear_time = datetime.datetime.strptime(cache_clear_time, '%Y-%m-%dT%H:%M:%S').timestamp()
-        cache_list = self.fhdhr.db.get_cacheitem_value("cache_list", "offline_cache", "origin") or []
+        cache_list = self.fhdhr.db.get_cacheitem_value("cache_list", "epg_cache", "origin") or []
         cache_to_kill = []
         for cacheitem in cache_list:
             cachetime = str(cacheitem).split("_")[-1]
             if float(cachetime) < cache_clear_time:
                 cache_to_kill.append(cacheitem)
-                self.fhdhr.db.delete_cacheitem_value(str(cacheitem), "offline_cache", "origin")
+                self.fhdhr.db.delete_cacheitem_value(str(cacheitem), "epg_cache", "origin")
                 self.fhdhr.logger.info('Removing stale cache:  ' + str(cacheitem))
-        self.fhdhr.db.set_cacheitem_value("cache_list", "offline_cache", [x for x in cache_list if x not in cache_to_kill], "origin")
+        self.fhdhr.db.set_cacheitem_value("cache_list", "epg_cache", [x for x in cache_list if x not in cache_to_kill], "origin")
 
     def clear_cache(self):
-        cache_list = self.fhdhr.db.get_cacheitem_value("cache_list", "offline_cache", "origin") or []
+        cache_list = self.fhdhr.db.get_cacheitem_value("cache_list", "epg_cache", "origin") or []
         for cacheitem in cache_list:
-            self.fhdhr.db.delete_cacheitem_value(cacheitem, "offline_cache", "origin")
+            self.fhdhr.db.delete_cacheitem_value(cacheitem, "epg_cache", "origin")
             self.fhdhr.logger.info('Removing cache:  ' + str(cacheitem))
-        self.fhdhr.db.delete_cacheitem_value("cache_list", "offline_cache", "origin")
+        self.fhdhr.db.delete_cacheitem_value("cache_list", "epg_cache", "origin")
