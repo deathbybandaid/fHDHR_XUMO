@@ -17,8 +17,8 @@ class OriginEPG():
         for fhdhr_id in list(fhdhr_channels.list.keys()):
             chan_obj = fhdhr_channels.list[fhdhr_id]
 
-            if str(chan_obj.dict["number"]) not in list(programguide.keys()):
-                programguide[str(chan_obj.dict["number"])] = chan_obj.epgdict
+            if str(chan_obj.number) not in list(programguide.keys()):
+                programguide[str(chan_obj.number)] = chan_obj.epgdict
 
             cached_items = self.get_cached(chan_obj.dict["origin_id"])
             for cached_item in cached_items:
@@ -52,8 +52,8 @@ class OriginEPG():
                                     "id": str(content_id)
                                     }
 
-                    if not any(d['id'] == clean_prog_dict['id'] for d in programguide[str(chan_obj.dict["number"])]["listing"]):
-                        programguide[str(chan_obj.dict["number"])]["listing"].append(clean_prog_dict)
+                    if not any(d['id'] == clean_prog_dict['id'] for d in programguide[str(chan_obj.number)]["listing"]):
+                        programguide[str(chan_obj.number)]["listing"].append(clean_prog_dict)
 
         return programguide
 
