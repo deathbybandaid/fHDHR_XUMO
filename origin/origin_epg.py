@@ -26,7 +26,11 @@ class OriginEPG():
                 for asset in cached_item["assets"]:
 
                     content_id = asset["id"]
-                    content_cache = self.get_cached_content(content_id)
+                    # content_cache = self.get_cached_content(content_id)
+                    content_cache = {
+                                    'title': "Unavailable",
+                                    'description': "Unavailable",
+                                    }
 
                     timestart = int(asset['timestamps']["start"] / 1000)
                     timeend = int(asset['timestamps']["end"] / 1000)
